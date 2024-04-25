@@ -51,7 +51,10 @@ public abstract class RedisResultSetBase<T, RR, R> implements ResultSet {
         List<ColumnMetaData> resultColumns = createResultColumns(result);
         ColumnHint columnHint = result.getQuery().getColumnHint();
         if (columnHint == null) return resultColumns;
-        return new ArrayList<>() {{ add(createHintColumn(columnHint)); addAll(resultColumns); }};
+        return new ArrayList<>() {{
+            add(createHintColumn(columnHint));
+            addAll(resultColumns);
+        }};
     }
 
     protected ColumnMetaData createHintColumn(@NotNull ColumnHint columnHint) {
@@ -291,7 +294,8 @@ public abstract class RedisResultSetBase<T, RR, R> implements ResultSet {
     public Object getObject(String columnLabel) throws SQLException {
         checkClosed();
         if (index > rows.size()) throw new SQLException("Exhausted ResultSet.");
-        if (columnHint != null && columnHint.getName().equals(columnLabel)) return getColumnHintObject(columnHint, index);
+        if (columnHint != null && columnHint.getName().equals(columnLabel))
+            return getColumnHintObject(columnHint, index);
         return currentRow != null ? getResultObject(currentRow, columnLabel) : null;
     }
 
@@ -327,12 +331,12 @@ public abstract class RedisResultSetBase<T, RR, R> implements ResultSet {
 
     @Override
     public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
-        throw new SQLFeatureNotSupportedException();
+        return BigDecimal.valueOf(getDouble(columnIndex));
     }
 
     @Override
     public BigDecimal getBigDecimal(String columnLabel) throws SQLException {
-        throw new SQLFeatureNotSupportedException();
+        return BigDecimal.valueOf(getDouble(columnLabel));
     }
 
     @Override
